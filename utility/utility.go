@@ -8,8 +8,8 @@ import (
 
 func CalculatePhytagoras(legA int, legB int, hyp int) (map[string]int, error) {
 	sides := make(map[string]int, 3)
-	sides["legA"] = legA
-	sides["legB"] = legB
+	sides["LegA"] = legA
+	sides["LegB"] = legB
 	sides["Hypotenuse"] = hyp
 	var targetSide string
 
@@ -19,19 +19,23 @@ func CalculatePhytagoras(legA int, legB int, hyp int) (map[string]int, error) {
 		}
 	}
 
+	if targetSide == "" {
+		return nil, errors.New("Please put 0 on one of the values, it will indicates the value that needs to be targeted for the calculations")
+	}
+
 	fmt.Printf("Your targeted side is: %v\n", targetSide)
 
 	sidesTmp := sides
 
 	delete(sidesTmp, targetSide)
 
-	fmt.Println("\nHere is the value you have:")
-	for index, value := range sidesTmp {
-		fmt.Printf("%v = %d\n", index, value)
-	}
-
 	if targetSide == "Hypotenuse" {
-		result := hypotenusePhyCalc(sidesTmp)
+		result, err := hypotenusePhyCalc(sidesTmp)
+
+		if err != nil {
+			return nil, err
+		}
+
 		sides[targetSide] = result
 	} else {
 		result, err := notHypotenusePhyCalc(sidesTmp)
@@ -39,13 +43,21 @@ func CalculatePhytagoras(legA int, legB int, hyp int) (map[string]int, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		sides[targetSide] = result
 	}
 
 	return sides, nil
 }
 
-func hypotenusePhyCalc(sides map[string]int) int {
+func DisplayKnownValue(sides map[string]int) {
+	fmt.Println("\nHere is the value you have:")
+	for index, value := range sides {
+		fmt.Printf("%v = %d\n", index, value)
+	}
+}
+
+func hypotenusePhyCalc(sides map[string]int) (int, error) {
 	sideSlices := make([]int, 0, 2)
 	var legA int
 	var legB int
@@ -59,7 +71,11 @@ func hypotenusePhyCalc(sides map[string]int) int {
 
 	result := int(math.Sqrt(float64(intPow(legA, 2)) + float64(intPow(legB, 2))))
 
-	return result
+	if result < legA || result < legB {
+		return 0, errors.New("Calculation faults. The value of Hypotenuse is smaller than legs, which, hypothetically speaking is impossible.")
+	}
+
+	return result, nil
 }
 
 func notHypotenusePhyCalc(sides map[string]int) (int, error) {
@@ -75,12 +91,19 @@ func notHypotenusePhyCalc(sides map[string]int) (int, error) {
 		return 0, errors.New("The value of the hypotenuse must not equal to the value of a known leg. It will result with 0, meaning no triangle at all.")
 	}
 
-	if sideSlices[0] > sideSlices[1] {
-		hyp = sideSlices[0]
-		leg = sideSlices[1]
-	} else {
-		hyp = sideSlices[1]
-		leg = sideSlices[0]
+	hyp = sides["Hypotenuse"]
+	delete(sides, "Hypotenuse")
+
+	if len(sides) != 1 {
+		return 0, errors.New("Process Terminated")
+	}
+
+	for _, value := range sides {
+		leg = value
+	}
+
+	if hyp < leg {
+		return 0, errors.New("In the case of searching the unknown value of 1 leg, the value of the known leg must NOT be bigger than the value of hypotenuse.")
 	}
 
 	result := int(math.Sqrt(float64(intPow(hyp, 2)) - float64(intPow(leg, 2))))
@@ -88,19 +111,19 @@ func notHypotenusePhyCalc(sides map[string]int) (int, error) {
 	return result, nil
 }
 
-func intPow(num int, pow int) int {
-	if pow == 0 {
+func intPow(base int, exponent int) int {
+	if exponent == 0 {
 		return 1
 	}
 
-	if pow == 1 {
-		return num
+	if exponent == 1 {
+		return base
 	}
 
-	result := num
+	result := base
 
-	for i := 2; i <= pow; i++ {
-		result *= num
+	for i := 2; i <= exponent; i++ {
+		result *= base
 	}
 
 	return result
