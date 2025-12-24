@@ -1,4 +1,4 @@
-package utility
+package main
 
 import (
 	"testing"
@@ -34,33 +34,36 @@ func TestIntPow(t *testing.T) {
 func TestNotHypotenusePhyCalc(t *testing.T) {
 	tests := []struct {
 		name    string
-		sides   map[string]int
+		sides   Triangle
 		want    int
 		wantErr bool
 	}{
 		{
 			name: "Normal Case",
-			sides: map[string]int{
-				"LegA":       8,
-				"Hypotenuse": 10,
+			sides: Triangle{
+				LegA:       8,
+				LegB:       0,
+				Hypotenuse: 10,
 			},
 			want:    6,
 			wantErr: false,
 		},
 		{
 			name: "Leg Value == Hypotenuse Value",
-			sides: map[string]int{
-				"LegA":       8,
-				"Hypotenuse": 8,
+			sides: Triangle{
+				LegA:       8,
+				LegB:       0,
+				Hypotenuse: 8,
 			},
 			want:    0,
 			wantErr: true,
 		},
 		{
 			name: "Leg Value > Hypotenuse Value",
-			sides: map[string]int{
-				"LegA":       8,
-				"Hypotenuse": 6,
+			sides: Triangle{
+				LegA:       8,
+				LegB:       0,
+				Hypotenuse: 6,
 			},
 			want:    0,
 			wantErr: true,
@@ -69,7 +72,7 @@ func TestNotHypotenusePhyCalc(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result, err := notHypotenusePhyCalc(test.sides)
+			result, err := notHypotenusePhyCalc(&test.sides)
 
 			if test.wantErr {
 				if err == nil {
@@ -91,24 +94,26 @@ func TestNotHypotenusePhyCalc(t *testing.T) {
 func TestHypotenusePhyCalc(t *testing.T) {
 	tests := []struct {
 		name    string
-		sides   map[string]int
+		sides   Triangle
 		want    int
 		wantErr bool
 	}{
 		{
 			name: "Normal Case",
-			sides: map[string]int{
-				"LegA": 8,
-				"LegB": 6,
+			sides: Triangle{
+				LegA:       8,
+				LegB:       6,
+				Hypotenuse: 0,
 			},
 			want:    10,
 			wantErr: false,
 		},
 		{
 			name: "Big Number",
-			sides: map[string]int{
-				"LegA": 5000,
-				"LegB": 5000,
+			sides: Triangle{
+				LegA:       5000,
+				LegB:       5000,
+				Hypotenuse: 0,
 			},
 			want:    7071,
 			wantErr: false,
@@ -117,7 +122,7 @@ func TestHypotenusePhyCalc(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result, err := hypotenusePhyCalc(test.sides)
+			result, err := hypotenusePhyCalc(&test.sides)
 
 			if test.wantErr {
 				if err == nil {
