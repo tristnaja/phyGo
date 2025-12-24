@@ -20,7 +20,13 @@ func CalculatePhytagoras(sides *Triangle) (Triangle, error) {
 			return *sides, err
 		}
 
-		sides.Hypotenuse = result
+		if sides.LegA == 0 {
+			sides.LegA = result
+
+			return *sides, nil
+		}
+
+		sides.LegB = result
 
 		return *sides, nil
 	}
@@ -31,13 +37,7 @@ func CalculatePhytagoras(sides *Triangle) (Triangle, error) {
 		return *sides, nil
 	}
 
-	if sides.LegA == 0 {
-		sides.LegA = result
-
-		return *sides, nil
-	}
-
-	sides.LegB = result
+	sides.Hypotenuse = result
 
 	return *sides, nil
 }
